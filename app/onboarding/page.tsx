@@ -1,35 +1,93 @@
 'use client';
 
+import { UserSchema } from '@/libs/schema';
 import React, { useState, useEffect } from 'react';
+import {useForm} from 'react-hook-form'
+import z from 'zod';
+import {zodResolver} from '@hookform/resolvers/zod'
+import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
+import { toast } from '@heroui/theme';
+import { fa } from 'zod/v4/locales';
+import { EmailLinkErrorCodeStatus } from '@clerk/nextjs/dist/types/client-boundary/hooks';
 
 // Profile Form Page Component
 export default function ProfilePage() {
   // Dark mode state
   const [isDarkMode, setIsDarkMode] = useState(false);
+  // User state
+  const { isSignedIn, user, isLoaded } = useUser()
+  const router = useRouter();
+  console.log(user);
 
-  // Form state
-  const [formData, setFormData] = useState({
-    name: '',
-    class: '',
-    city: '',
-    state: '',
-    age: '',
-    interest: '',
-  });
-
-  // Initialize dark mode
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const {register, handleSubmit, formState : {errors} } =
+   useForm<z.infer<typeof UserSchema>>(
+    {resolver: zodResolver(UserSchema),
+defaultValues: {
+  email: ""
+}
+})
+  // Handle form submit
+  const onSubmit = async (data: z.infer<typeof UserSchema>)=> {
+  console.log("onSubmit called");
+  console.log("Form data:", data);
+  console.log("User email:", user?.primaryEmailAddress?.emailAddress);
+  
+  try {
+    console.log(" Starting fetch...");
     
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      setIsDarkMode(true);
-      document.documentElement.classList.add('dark');
-    } else {
-      setIsDarkMode(false);
-      document.documentElement.classList.remove('dark');
+    const payload = {
+      ...data, 
+      email: user?.primaryEmailAddress?.emailAddress
+    };
+    console.log("Payload being sent:", payload);
+    
+    const response = await fetch('/api/v1/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload)
+    });
+    // const response = await fetch('/api/v1/users', {
+    //   method: 'GET',
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   }
+    // });
+
+    console.log("Response status:", response.status);
+    console.log("Response ok:", response.ok);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Error response:", errorText);
+      throw new Error(`Failed to submit: ${response.status}`);
     }
-  }, []);
+    console.log("response: ");
+    console.log(response.body);
+    const result = await response.json();
+    console.log("Success result:", result);
+    
+    router.push('/dashboard');
+  } catch (err) {
+    console.error("Catch block error:", err);
+  }
+};
+
+  // // Initialize dark mode
+  // useEffect(() => {
+  //   // const savedTheme = localStorage.getItem('theme');
+  //   // const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+  //   // if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+  //   //   setIsDarkMode(true);
+  //   //   document.documentElement.classList.add('dark');
+  //   // } else {
+  //   //   setIsDarkMode(false);
+  //   //   document.documentElement.classList.remove('dark');
+  //   // }
+  // }, []);
 
   // Toggle dark mode
   const toggleDarkMode = () => {
@@ -43,20 +101,19 @@ export default function ProfilePage() {
       setIsDarkMode(true);
     }
   };
+  //   if(!isLoaded) {
+  //   return (<div>Loading...</div>)
+  // }
+  // console.log("errors : " + errors)
+  // console.log("email errors : " + errors.email?.message)
+  // console.log("name errors : " + errors.name?.message)
+  // console.log("age errors : " + errors.age?.message)
+  // console.log("class errors : " + errors.class?.message)
+  // console.log("error keys" + Object.values(errors))
 
-  // Handle form input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
 
-  // Handle form submission
-  const handleSubmit = () => {
-    console.log('Form submitted:', formData);
-    // Add your form submission logic here
-  };
+
+ 
 
   return (
     // <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-950 dark:to-indigo-950 transition-colors duration-300">
@@ -121,23 +178,22 @@ export default function ProfilePage() {
 
             {/* Form Card */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 md:p-8">
+              {errors && <span>{errors.toString()}</span>}
               <div className="space-y-5">
-                
+                <form onSubmit={handleSubmit(onSubmit)}>
                 {/* Name Field */}
-                <div>
+              
                   <label htmlFor="name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     What's your name? ✨
                   </label>
                   <input
                     type="text"
                     id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
+                    {...register("name")}
                     placeholder="Enter your full name"
                     className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-violet-500 focus:ring-4 focus:ring-violet-200 dark:focus:ring-violet-900/50 transition-all duration-200 outline-none"
                   />
-                </div>
+                
 
                 {/* Class Field */}
                 <div>
@@ -147,9 +203,7 @@ export default function ProfilePage() {
                   <input
                     type="text"
                     id="class"
-                    name="class"
-                    value={formData.class}
-                    onChange={handleChange}
+                    {...register("class")}
                     placeholder="e.g., 12th Grade, College Freshman"
                     className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-violet-500 focus:ring-4 focus:ring-violet-200 dark:focus:ring-violet-900/50 transition-all duration-200 outline-none"
                   />
@@ -163,11 +217,9 @@ export default function ProfilePage() {
                       City 🌆
                     </label>
                     <input
-                      type="text"
+                      type="number"
                       id="city"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleChange}
+                      {...register("city_id")}
                       placeholder="Your city"
                       className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-violet-500 focus:ring-4 focus:ring-violet-200 dark:focus:ring-violet-900/50 transition-all duration-200 outline-none"
                     />
@@ -179,11 +231,9 @@ export default function ProfilePage() {
                       State 🗺️
                     </label>
                     <input
-                      type="text"
+                      type="number"
                       id="state"
-                      name="state"
-                      value={formData.state}
-                      onChange={handleChange}
+                      {...register("state_id")}
                       placeholder="Your state"
                       className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-violet-500 focus:ring-4 focus:ring-violet-200 dark:focus:ring-violet-900/50 transition-all duration-200 outline-none"
                     />
@@ -198,9 +248,7 @@ export default function ProfilePage() {
                   <input
                     type="number"
                     id="age"
-                    name="age"
-                    value={formData.age}
-                    onChange={handleChange}
+                    {...register("age",{valueAsNumber: true})}
                     placeholder="Your age"
                     min="1"
                     max="120"
@@ -209,28 +257,28 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Interest Field */}
-                <div>
+                {/* <div>
                   <label htmlFor="interest" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     What interests you most? 💡
                   </label>
                   <input
                     type="text"
                     id="interest"
-                    name="interest"
-                    value={formData.interest}
-                    onChange={handleChange}
+                    
                     placeholder="e.g., Science, Arts, Technology, Business"
                     className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-violet-500 focus:ring-4 focus:ring-violet-200 dark:focus:ring-violet-900/50 transition-all duration-200 outline-none"
                   />
-                </div>
+                </div> */}
 
                 {/* Submit Button */}
+   
                 <button
-                  onClick={handleSubmit}
+                  type="submit"
                   className="w-full py-4 px-6 bg-violet-600 hover:bg-violet-700 dark:bg-violet-500 dark:hover:bg-violet-600 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-violet-300 dark:focus:ring-violet-700"
                 >
                   Continue Your Journey 🎯
                 </button>
+                </form>
 
                 {/* Optional: Progress indicator or encouraging text */}
                 <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">

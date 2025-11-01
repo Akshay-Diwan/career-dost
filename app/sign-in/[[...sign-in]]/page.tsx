@@ -177,15 +177,11 @@ export default function SignInPage() {
               }
               }
             }
-
-               
-              
-              // Redirect after sign in
-              redirectUrl="/"
-              
               // Show alternative sign in methods
               routing="path"
               path="/sign-in"
+              fallbackRedirectUrl={'/dashboard2'}
+              signUpFallbackRedirectUrl={'/onboarding'}
             />
 
             {/* Additional help text */}
