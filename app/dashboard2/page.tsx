@@ -1,12 +1,14 @@
 'use client';
 
 import { useUser } from '@clerk/nextjs';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 
 // Main Dashboard Page Component
 export default function DashboardPage() {
   // Dark mode state - checks system preference on mount
+  const [topCareer, setTopCareer] = useState([]);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const router = useRouter();
   const { isLoaded, user }= useUser();
@@ -22,6 +24,32 @@ export default function DashboardPage() {
       setIsDarkMode(false);
       document.documentElement.classList.remove('dark');
     }
+    fetch(`/api/v1/${user?.primaryEmailAddress?.emailAddress}/quizResults`)
+    .then(res => res.json())
+    .then(data => {
+      const {id, user_email, created_at, ...parameters} = data[0]
+      console.log("Input")
+      console.log(parameters)
+      fetch("http://localhost:8001/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type" : "application/json"
+        },
+        body: JSON.stringify({...parameters, conversation_id: "string"})
+      })
+      .then(res => res.json())
+      .then(str => {
+        console.log("Top 5 careers : ")
+        console.log(str)
+        const careers = str.response
+            .split('\n')                      // split by newline
+              .map(line => line.replace(/^\d+\.\s*/, '').trim());  // remove "1. ", "2. ", etc
+
+        setTopCareer(careers);
+      })
+      .catch(err => console.error(err))
+    })
+    .catch(err => console.error(err))
   }, []);
 
   // Toggle dark mode function
@@ -66,9 +94,9 @@ export default function DashboardPage() {
                   <p className="text-base md:text-lg text-gray-700 dark:text-gray-300">
                     Take our quiz and we can recommend the perfect path for you based on your interests and strengths.
                   </p>
-                  <button className="px-6 py-3 bg-violet-600 hover:bg-violet-700 dark:bg-violet-500 dark:hover:bg-violet-600 text-white font-semibold rounded-lg shadow-md transition-all duration-200 transform hover:scale-105">
+                  <Link href="/quiz" className="px-6 py-3 bg-violet-600 hover:bg-violet-700 dark:bg-violet-500 dark:hover:bg-violet-600 text-white font-semibold rounded-lg shadow-md transition-all duration-200 transform hover:scale-105">
                     Take Quiz Now
-                  </button>
+                  </Link>
                 </div>
 
                 {/* Illustration - Hidden on mobile */}
@@ -260,6 +288,7 @@ export default function DashboardPage() {
           </div>
 
           {/* RIGHT COLUMN: Top 5 Careers Sidebar - Only visible on DESKTOP (lg and above) */}
+          {topCareer.length > 0 &&
           <aside className="hidden lg:block lg:w-[30%]">
             <div className="bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 sticky top-8">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
@@ -275,11 +304,11 @@ export default function DashboardPage() {
 
               <div className="space-y-3">
                 {[
-                  { name: 'Software Engineer', icon: '💻', color: 'from-blue-500 to-cyan-500' },
-                  { name: 'Data Scientist', icon: '📊', color: 'from-purple-500 to-pink-500' },
-                  { name: 'Graphic Designer', icon: '🎨', color: 'from-pink-500 to-rose-500' },
-                  { name: 'Marketing Specialist', icon: '📈', color: 'from-orange-500 to-red-500' },
-                  { name: 'Content Creator', icon: '✍️', color: 'from-green-500 to-emerald-500' }
+                  { name: topCareer[0], icon: '🥇', color: 'from-blue-500 to-cyan-500' },
+                  { name: topCareer[1], icon: '🥈', color: 'from-purple-500 to-pink-500' },
+                  { name: topCareer[2], icon: '🥉', color: 'from-pink-500 to-rose-500' },
+                  { name: topCareer[3], icon: '🎖️', color: 'from-orange-500 to-red-500' },
+                  { name: topCareer[4], icon: '🎖️', color: 'from-green-500 to-emerald-500' }
                 ].map((career, index) => (
                   <div
                     key={index}
@@ -318,6 +347,7 @@ export default function DashboardPage() {
               </button> */}
             </div>
           </aside>
+}
         </div>
       </main>
     </div>

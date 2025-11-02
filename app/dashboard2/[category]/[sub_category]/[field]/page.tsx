@@ -1,10 +1,16 @@
 "use client";
 
+import { joinCommunity } from "@/libs/communities.actions";
 import { Button } from "@heroui/button";
+import { useRouter } from "next/navigation"
 import React, { useState } from "react";
 
 export default function CACoursePage() {
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const router = useRouter();
+  const [fieldData, setFieldData] = useState({
+    id: 2
+  })
   const keySkills = [
     "MathematicalThinking",
     "ProblemSolving", 
@@ -20,27 +26,49 @@ export default function CACoursePage() {
   ]);
   const [inputMessage, setInputMessage] = useState("");
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (inputMessage.trim() === "") return;
 
     // Add user message
     setMessages([...messages, { text: inputMessage, isUser: true }]);
-    
+    let answer = "";
+    try{
+    const response = await fetch("http://localhost:8000/chat", {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(
+          {
+  "field": "Charted Accountant",
+  "message": inputMessage,
+  "role": "user",
+  "conversation_id": "string"
+    }    
+      )
+    })
+    const data = await response.json();
+    answer = data.response;
+    console.log(answer)
+  }catch(err){
+      answer = "Sorry we are facing a issue"
+  }
     // Simulate AI response after a delay
-    setTimeout(() => {
-      const responses = [
-        "That's a great question! The CA course typically takes 4-5 years to complete.",
-        "The pass rate varies, but with dedication and proper study, you can succeed!",
-        "CA articleship provides hands-on experience in auditing, taxation, and accounting.",
-        "Yes, you can pursue CA after 12th by registering for CA Foundation.",
-        "The average starting salary for CAs ranges from ₹6-8 LPA and grows significantly with experience."
-      ];
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      setMessages(prev => [...prev, { text: randomResponse, isUser: false }]);
-    }, 1000);
+
+      setMessages(prev => [...prev, { text: answer, isUser: false }]);
 
     setInputMessage("");
   };
+  const handleJoinCommmunity = async ()=> {
+    const res = await joinCommunity(fieldData.id);
+    if(res){
+      router.push('/dashboard2/community');
+      console.log(res);
+    }
+    else {
+      console.error("could not join community");
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
@@ -66,7 +94,7 @@ export default function CACoursePage() {
                   {isChatOpen ? "Close AI Chat" : "Launch AI Chat Session"}
                 </button>
                 
-                <button className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center gap-2">
+                <button onClick = {handleJoinCommmunity} className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center gap-2">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>

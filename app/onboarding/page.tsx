@@ -7,9 +7,12 @@ import z from 'zod';
 import {zodResolver} from '@hookform/resolvers/zod'
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import { toast } from '@heroui/theme';
-import { fa } from 'zod/v4/locales';
-import { EmailLinkErrorCodeStatus } from '@clerk/nextjs/dist/types/client-boundary/hooks';
+import {Autocomplete, AutocompleteItem} from "@heroui/react";
+import { createContentSecurityPolicyHeaders } from '@clerk/nextjs/dist/types/server/content-security-policy';
+interface Location{
+  name: string,
+  id: number
+}
 
 // Profile Form Page Component
 export default function ProfilePage() {
@@ -19,8 +22,27 @@ export default function ProfilePage() {
   const { isSignedIn, user, isLoaded } = useUser()
   const router = useRouter();
   console.log(user);
+  const [states, setStates] = useState<Location[]>([]);
+  const [cities, setCities] = useState<Location[]>([]);
+  const [selectedState, setSelectedState] = useState<string>();
+  const [selectedCity, setSelectedCity] = useState<string>();
 
-  const {register, handleSubmit, formState : {errors} } =
+  // Fetch all states
+  useEffect(() => {
+    fetch('/api/v1/locations/states')
+      .then(res => res.json())
+      .then(data => setStates(data));
+  }, []);
+
+  // Fetch cities for the selected state
+  useEffect(() => {
+    if (!selectedState) return;
+    fetch(`/api/v1/locations/${selectedState}`)
+      .then(res => res.json())
+      .then(data => setCities(data));
+  }, [selectedState]);
+
+  const {register, handleSubmit, formState : {errors}, setValue } =
    useForm<z.infer<typeof UserSchema>>(
     {resolver: zodResolver(UserSchema),
 defaultValues: {
@@ -32,13 +54,15 @@ defaultValues: {
   console.log("onSubmit called");
   console.log("Form data:", data);
   console.log("User email:", user?.primaryEmailAddress?.emailAddress);
-  
+  if(!selectedState || !selectedCity) return;
   try {
     console.log(" Starting fetch...");
     
     const payload = {
       ...data, 
-      email: user?.primaryEmailAddress?.emailAddress
+      email: user?.primaryEmailAddress?.emailAddress,
+      state_id: states.findLast((state) => state.name === selectedState)?.id ?? -1,
+      city_id: cities.findLast((city) => city.name === selectedCity)?.id ?? -1
     };
     console.log("Payload being sent:", payload);
     
@@ -165,7 +189,7 @@ defaultValues: {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
           {/* RIGHT COLUMN (Desktop) / BOTTOM (Mobile): Title + Form */}
-          <div className="space-y-6 w-[40vw] mx-auto">
+          <div className="space-y-6 w-[80vw] mx-auto sm:w-[40vw]">
             {/* Page Title */}
             <div className="text-center md:text-left">
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-3">
@@ -178,7 +202,6 @@ defaultValues: {
 
             {/* Form Card */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 md:p-8">
-              {errors && <span>{errors.toString()}</span>}
               <div className="space-y-5">
                 <form onSubmit={handleSubmit(onSubmit)}>
                 {/* Name Field */}
@@ -196,7 +219,7 @@ defaultValues: {
                 
 
                 {/* Class Field */}
-                <div>
+                <div className='my-3'>
                   <label htmlFor="class" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     What class are you in? 📚
                   </label>
@@ -211,22 +234,8 @@ defaultValues: {
 
                 {/* City & State Row (Side by side on larger screens) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* City Field */}
-                  <div>
-                    <label htmlFor="city" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      City 🌆
-                    </label>
-                    <input
-                      type="number"
-                      id="city"
-                      {...register("city_id")}
-                      placeholder="Your city"
-                      className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-violet-500 focus:ring-4 focus:ring-violet-200 dark:focus:ring-violet-900/50 transition-all duration-200 outline-none"
-                    />
-                  </div>
-
                   {/* State Field */}
-                  <div>
+                  {/* <div>
                     <label htmlFor="state" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                       State 🗺️
                     </label>
@@ -237,11 +246,61 @@ defaultValues: {
                       placeholder="Your state"
                       className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-violet-500 focus:ring-4 focus:ring-violet-200 dark:focus:ring-violet-900/50 transition-all duration-200 outline-none"
                     />
-                  </div>
+                  </div> */}
+
+                  {/* City Field */}
+                  {/* <div>
+                    <label htmlFor="city" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      City 🌆
+                    </label>
+                    <input
+                      type="number"
+                      id="city"
+                      {...register("city_id")}
+                      placeholder="Your city"
+                      className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-violet-500 focus:ring-4 focus:ring-violet-200 dark:focus:ring-violet-900/50 transition-all duration-200 outline-none"
+                    />
+                  </div> */}
+                        {/* State Autocomplete */}
+      <Autocomplete
+        variant='bordered'
+        label="Select State"
+        placeholder="Search state..."
+        onSelectionChange={(key) => {
+          setSelectedState(key);
+          setSelectedCity(undefined);
+          console.log(selectedState);
+        }}
+        selectedKey={selectedState}
+      >
+        {states.map((state) => (
+          <AutocompleteItem key={state.name} value={state.id}>
+            {state.name}
+          </AutocompleteItem>
+        ))}
+      </Autocomplete>
+
+      {/* City Autocomplete */}
+      <Autocomplete
+      variant='bordered'
+        label="Select City"
+        placeholder={
+          selectedState ? "Search city..." : "Select state first"
+        }
+        onSelectionChange={(key) => setSelectedCity(key)}
+        selectedKey={selectedCity}
+        isDisabled={!selectedState}
+      >
+        {cities.map((city) => (
+          <AutocompleteItem key = {city.name} value={city.id}>
+            {city.name}
+          </AutocompleteItem>
+        ))}
+      </Autocomplete>
                 </div>
 
                 {/* Age Field */}
-                <div>
+                <div className='my-2.5'>
                   <label htmlFor="age" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     How old are you? 🎂
                   </label>

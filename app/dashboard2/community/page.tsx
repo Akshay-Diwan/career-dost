@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient, SupabaseClient, User } from "@supabase/supabase-js";
-
+import { allMessages } from "@/libs/messages";
+import { useSupabaseClient } from "@/components/supabaseAuthsetup";
 // Types
 interface Community {
   id: string;
   name: string;
-  description: string;
+  description?: string;
 }
 
 interface Message {
@@ -25,15 +26,14 @@ interface UserProfile {
 
 export default function ChatPage() {
   // Supabase client state
-  const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
-  
+  // const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
   // Auth state
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   
   // Community state
   const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null);
-  const [joinedCommunities, setJoinedCommunities] = useState<Community[]>([]);
+  const [joinedCommunities, setJoinedCommunities] = useState<Community[]>(Array.from(allMessages.keys()));
   
   // Search state
   const [searchQuery, setSearchQuery] = useState("");
@@ -48,48 +48,49 @@ export default function ChatPage() {
   
   // Ref for auto-scroll
   const messagesEndRef = useRef<HTMLDivElement>(null);
+     const supabase = useSupabaseClient();
 
   // Initialize Supabase client
-  useEffect(() => {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  // useEffect(() => {
+  //   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  //   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
     
-    if (supabaseUrl && supabaseAnonKey) {
-      const client = createClient(supabaseUrl, supabaseAnonKey);
-      setSupabase(client);
-    }
-  }, []);
+  //   if (supabaseUrl && supabaseAnonKey) {
+  //     const client = createClient(supabaseUrl, supabaseAnonKey);
+  //     setSupabase(client);
+  //   }
+  // }, []);
 
   // Auth listener - Handle user authentication
-  useEffect(() => {
-    if (!supabase) return;
+  // useEffect(() => {
+  //   if (!supabase) return;
 
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setUser(session.user);
-      } else {
-        // Sign in anonymously if no user
-        supabase.auth.signInAnonymously().then(({ data }) => {
-          if (data.user) {
-            setUser(data.user);
-          }
-        });
-      }
-      setIsLoading(false);
-    });
+  //   // Get initial session
+  //   supabase.auth.getSession().then(({ data: { session } }) => {
+  //     if (session?.user) {
+  //       setUser(session.user);
+  //     } else {
+  //       // Sign in anonymously if no user
+  //       supabase.auth.signInAnonymously().then(({ data }) => {
+  //         if (data.user) {
+  //           setUser(data.user);
+  //         }
+  //       });
+  //     }
+  //     setIsLoading(false);
+  //   });
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
+  //   // Listen for auth changes
+  //   const { data: { subscription } } = supabase.auth.onAuthStateChange(
+  //     (_event, session) => {
+  //       setUser(session?.user ?? null);
+  //     }
+  //   );
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [supabase]);
+  //   return () => {
+  //     subscription.unsubscribe();
+  //   };
+  // }, [supabase]);
 
   // Fetch user profile and joined communities
   useEffect(() => {
@@ -165,6 +166,7 @@ export default function ChatPage() {
   // Join a community
   const handleJoin = useCallback(
     async (communityId: string) => {
+
       if (!supabase || !user || !userProfile) return;
 
       // Check if already joined
@@ -237,21 +239,22 @@ export default function ChatPage() {
     fetchMessages();
 
     // Step 2: Subscribe to real-time updates
-    const channel = supabase
-      .channel(`messages:${selectedCommunity.id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-          filter: `community_id=eq.${selectedCommunity.id}`,
-        },
-        (payload) => {
-          setMessages((currentMessages) => [...currentMessages, payload.new as Message]);
-        }
-      )
-      .subscribe();
+    // const channel = supabase
+     // Use a private channel for room messages
+    const channel = supabase.channel(`room:${2}:messages`, {
+        config: { private: false }
+    })
+    // Listen for broadcasts (INSERT/UPDATE/DELETE come through as events)
+    channel.on('broadcast', { event: 'INSERT' }, (payload: any) => {
+     console.log('message inserted', payload);
+    });
+    channel.on('broadcast', { event: 'UPDATE' }, (payload: any) => {
+      console.log('message updated', payload);
+    });
+    channel.on('broadcast', { event: 'DELETE' }, (payload: any) => {
+      console.log('message deleted', payload);
+    });
+        channel.subscribe();
 
     // Step 3: Cleanup on unmount
     return () => {
