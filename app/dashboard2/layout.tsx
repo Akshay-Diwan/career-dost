@@ -95,7 +95,7 @@ const layout = ({
               {/* Welcome Message */}
               <div className="flex items-center gap-3">
                 <span className="hidden sm:inline text-sm sm:text-base text-gray-700 dark:text-gray-300">
-                  Welcome, <span className="font-semibold text-violet-600 dark:text-violet-400">{user?.fullName}</span>
+                  Welcome, <span className="font-semibold text-violet-600 dark:text-violet-400">{user?.fullName || user?.username}</span>
                 </span>
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-semibold">
                   <img src = {user?.imageUrl} className='rounded-full'/>

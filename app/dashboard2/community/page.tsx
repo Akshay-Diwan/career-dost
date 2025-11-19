@@ -48,7 +48,7 @@ export default function ChatPage() {
   
   // Ref for auto-scroll
   const messagesEndRef = useRef<HTMLDivElement>(null);
-     const supabase = useSupabaseClient();
+    //  const supabase = useSupabaseClient();
 
   // Initialize Supabase client
   // useEffect(() => {
@@ -93,213 +93,213 @@ export default function ChatPage() {
   // }, [supabase]);
 
   // Fetch user profile and joined communities
-  useEffect(() => {
-    if (!supabase || !user) return;
+  // useEffect(() => {
+  //   if (!supabase || !user) return;
 
-    const fetchUserProfile = async () => {
+  //   const fetchUserProfile = async () => {
       // Step 1: Fetch user profile with joined communities
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("joined_communities")
-        .eq("user_id", user.id)
-        .single();
+      // const { data: profile, error: profileError } = await supabase
+      //   .from("profiles")
+      //   .select("joined_communities")
+      //   .eq("user_id", user.id)
+      //   .single();
 
-      if (profileError && profileError.code !== "PGRST116") {
-        console.error("Error fetching profile:", profileError);
-        return;
-      }
+      // if (profileError && profileError.code !== "PGRST116") {
+      //   console.error("Error fetching profile:", profileError);
+      //   return;
+      // }
 
-      // If profile doesn't exist, create one
-      if (!profile) {
-        await supabase.from("profiles").insert({
-          user_id: user.id,
-          joined_communities: [],
-        });
-        setUserProfile({ user_id: user.id, joined_communities: [] });
-        setJoinedCommunities([]);
-        return;
-      }
+      // // If profile doesn't exist, create one
+      // if (!profile) {
+      //   await supabase.from("profiles").insert({
+      //     user_id: user.id,
+      //     joined_communities: [],
+      //   });
+      //   setUserProfile({ user_id: user.id, joined_communities: [] });
+      //   setJoinedCommunities([]);
+      //   return;
+      // }
 
-      setUserProfile(profile);
+      // setUserProfile(profile);
 
       // Step 2: If user has joined communities, fetch their details
-      if (profile.joined_communities && profile.joined_communities.length > 0) {
-        const { data: communities, error: communitiesError } = await supabase
-          .from("communities")
-          .select("*")
-          .in("id", profile.joined_communities);
+  //     if (profile.joined_communities && profile.joined_communities.length > 0) {
+  //       const { data: communities, error: communitiesError } = await supabase
+  //         .from("communities")
+  //         .select("*")
+  //         .in("id", profile.joined_communities);
 
-        if (communitiesError) {
-          console.error("Error fetching communities:", communitiesError);
-          return;
-        }
+  //       if (communitiesError) {
+  //         console.error("Error fetching communities:", communitiesError);
+  //         return;
+  //       }
 
-        setJoinedCommunities(communities || []);
-      } else {
-        setJoinedCommunities([]);
-      }
-    };
+  //       setJoinedCommunities(communities || []);
+  //     } else {
+  //       setJoinedCommunities([]);
+  //     }
+  //   };
 
-    fetchUserProfile();
-  }, [supabase, user]);
+  //   fetchUserProfile();     
+  // }, [supabase, user]);
 
   // Search communities
-  const handleSearch = useCallback(async () => {
-    if (!supabase || !searchQuery.trim()) {
-      setSearchResults([]);
-      return;
-    }
+  // const handleSearch = useCallback(async () => {
+  //   if (!supabase || !searchQuery.trim()) {
+  //     setSearchResults([]);
+  //     return;
+  //   }
 
-    const { data, error } = await supabase
-      .from("communities")
-      .select("*")
-      .ilike("name", `%${searchQuery}%`);
+  //   const { data, error } = await supabase
+  //     .from("communities")
+  //     .select("*")
+  //     .ilike("name", `%${searchQuery}%`);
 
-    if (error) {
-      console.error("Error searching communities:", error);
-      return;
-    }
+  //   if (error) {
+  //     console.error("Error searching communities:", error);
+  //     return;
+  //   }
 
-    setSearchResults(data || []);
-  }, [supabase, searchQuery]);
+  //   setSearchResults(data || []);
+  // }, [supabase, searchQuery]);
 
   // Join a community
-  const handleJoin = useCallback(
-    async (communityId: string) => {
+  // const handleJoin = useCallback(
+  //   async (communityId: string) => {
 
-      if (!supabase || !user || !userProfile) return;
+  //     if (!supabase || !user) return;
 
-      // Check if already joined
-      if (userProfile.joined_communities.includes(communityId)) {
-        return;
-      }
+  //     // Check if already joined
+  //     if (userProfile.joined_communities.includes(communityId)) {
+  //       return;
+  //     }
 
-      const updatedCommunities = [...userProfile.joined_communities, communityId];
+  //     const updatedCommunities = [...userProfile.joined_communities, communityId];
 
-      // Update profile with new community
-      const { error } = await supabase
-        .from("profiles")
-        .upsert(
-          {
-            user_id: user.id,
-            joined_communities: updatedCommunities,
-          },
-          { onConflict: "user_id" }
-        );
+  //     // Update profile with new community
+  //     const { error } = await supabase
+  //       .from("profiles")
+  //       .upsert(
+  //         {
+  //           user_id: user.id,
+  //           joined_communities: updatedCommunities,
+  //         },
+  //         { onConflict: "user_id" }
+  //       );
 
-      if (error) {
-        console.error("Error joining community:", error);
-        return;
-      }
+  //     if (error) {
+  //       console.error("Error joining community:", error);
+  //       return;
+  //     }
 
-      // Update local state
-      setUserProfile({
-        ...userProfile,
-        joined_communities: updatedCommunities,
-      });
+  //     // Update local state
+  //     setUserProfile({
+  //       ...userProfile,
+  //       joined_communities: updatedCommunities,
+  //     });
 
-      // Fetch the newly joined community details
-      const { data: community } = await supabase
-        .from("communities")
-        .select("*")
-        .eq("id", communityId)
-        .single();
+  //     // Fetch the newly joined community details
+  //     const { data: community } = await supabase
+  //       .from("communities")
+  //       .select("*")
+  //       .eq("id", communityId)
+  //       .single();
 
-      if (community) {
-        setJoinedCommunities([...joinedCommunities, community]);
-      }
+  //     if (community) {
+  //       setJoinedCommunities([...joinedCommunities, community]);
+  //     }
 
-      // Clear search
-      setSearchQuery("");
-      setSearchResults([]);
-    },
-    [supabase, user, userProfile, joinedCommunities]
-  );
+  //     // Clear search
+  //     setSearchQuery("");
+  //     setSearchResults([]);
+  //   },
+  //   [supabase, user, userProfile, joinedCommunities]
+  // );
 
-  // Fetch messages and set up real-time subscription
-  useEffect(() => {
-    if (!supabase || !selectedCommunity) return;
+  // // Fetch messages and set up real-time subscription
+  // useEffect(() => {
+  //   if (!supabase || !selectedCommunity) return;
 
-    const fetchMessages = async () => {
-      // Step 1: Fetch initial messages
-      const { data, error } = await supabase
-        .from("messages")
-        .select("*")
-        .eq("community_id", selectedCommunity.id)
-        .order("created_at", { ascending: true });
+  //   const fetchMessages = async () => {
+  //     // Step 1: Fetch initial messages
+  //     const { data, error } = await supabase
+  //       .from("messages")
+  //       .select("*")
+  //       .eq("community_id", selectedCommunity.id)
+  //       .order("created_at", { ascending: true });
 
-      if (error) {
-        console.error("Error fetching messages:", error);
-        return;
-      }
+  //     if (error) {
+  //       console.error("Error fetching messages:", error);
+  //       return;
+  //     }
 
-      setMessages(data || []);
-    };
+  //     setMessages(data || []);
+  //   };
 
-    fetchMessages();
+  //   fetchMessages();
 
-    // Step 2: Subscribe to real-time updates
-    // const channel = supabase
-     // Use a private channel for room messages
-    const channel = supabase.channel(`room:${2}:messages`, {
-        config: { private: false }
-    })
-    // Listen for broadcasts (INSERT/UPDATE/DELETE come through as events)
-    channel.on('broadcast', { event: 'INSERT' }, (payload: any) => {
-     console.log('message inserted', payload);
-    });
-    channel.on('broadcast', { event: 'UPDATE' }, (payload: any) => {
-      console.log('message updated', payload);
-    });
-    channel.on('broadcast', { event: 'DELETE' }, (payload: any) => {
-      console.log('message deleted', payload);
-    });
-        channel.subscribe();
+  //   // Step 2: Subscribe to real-time updates
+  //   // const channel = supabase
+  //    // Use a private channel for room messages
+  //   const channel = supabase.channel(`room:${2}:messages`, {
+  //       config: { private: false }
+  //   })
+  //   // Listen for broadcasts (INSERT/UPDATE/DELETE come through as events)
+  //   channel.on('broadcast', { event: 'INSERT' }, (payload: any) => {
+  //    console.log('message inserted', payload);
+  //   });
+  //   channel.on('broadcast', { event: 'UPDATE' }, (payload: any) => {
+  //     console.log('message updated', payload);
+  //   });
+  //   channel.on('broadcast', { event: 'DELETE' }, (payload: any) => {
+  //     console.log('message deleted', payload);
+  //   });
+  //       channel.subscribe();
 
-    // Step 3: Cleanup on unmount
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase, selectedCommunity]);
+  //   // Step 3: Cleanup on unmount
+  //   return () => {
+  //     supabase.removeChannel(channel);
+  //   };
+  // }, [supabase, selectedCommunity]);
 
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  // // Auto-scroll to bottom when new messages arrive
+  // useEffect(() => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // }, [messages]);
 
-  // Send a message
-  const handleSend = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
+  // // Send a message
+  // const handleSend = useCallback(
+  //   async (e: React.FormEvent) => {
+  //     e.preventDefault();
       
-      if (!supabase || !user || !selectedCommunity || !newMessage.trim()) return;
+  //     if (!supabase || !user || !selectedCommunity || !newMessage.trim()) return;
 
-      const { error } = await supabase.from("messages").insert({
-        text: newMessage,
-        user_id: user.id,
-        community_id: selectedCommunity.id,
-      });
+  //     const { error } = await supabase.from("messages").insert({
+  //       text: newMessage,
+  //       user_id: user.id,
+  //       community_id: selectedCommunity.id,
+  //     });
 
-      if (error) {
-        console.error("Error sending message:", error);
-        return;
-      }
+  //     if (error) {
+  //       console.error("Error sending message:", error);
+  //       return;
+  //     }
 
-      setNewMessage("");
-    },
-    [supabase, user, selectedCommunity, newMessage]
-  );
+  //     setNewMessage("");
+  //   },
+  //   [supabase, user, selectedCommunity, newMessage]
+  // );
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-purple-200 dark:border-purple-800 border-t-purple-600 dark:border-t-purple-400 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+  //       <div className="text-center">
+  //         <div className="w-16 h-16 border-4 border-purple-200 dark:border-purple-800 border-t-purple-600 dark:border-t-purple-400 rounded-full animate-spin mx-auto mb-4"></div>
+  //         <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -327,11 +327,11 @@ export default function ChatPage() {
                 placeholder="Search communities..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                // onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                 className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
               <button
-                onClick={handleSearch}
+                // onClick={handleSearch}
                 className="px-4 py-2 bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600 text-white rounded-lg transition-colors"
               >
                 Search
@@ -365,7 +365,7 @@ export default function ChatPage() {
                       </div>
                       {!isJoined && (
                         <button
-                          onClick={() => handleJoin(community.id)}
+                          // onClick={() => handleJoin(community.id)}
                           className="px-3 py-1 bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600 text-white text-sm rounded-lg transition-colors"
                         >
                           Join
@@ -501,7 +501,7 @@ export default function ChatPage() {
 
               {/* Message Input Form */}
               <form
-                onSubmit={handleSend}
+                // onSubmit={handleSend}
                 className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4"
               >
                 <div className="flex gap-2">

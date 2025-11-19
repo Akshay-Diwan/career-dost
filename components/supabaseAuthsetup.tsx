@@ -1,5 +1,5 @@
 // (This example is for React/Next.js)
-import { useAuth } from "@clerk/nextjs";
+import { useUser, useSession } from "@clerk/nextjs";
 import { createClient } from "@supabase/supabase-js";
 import { useState, useEffect } from "react";
 
@@ -8,32 +8,28 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY!;
 
 export const useSupabaseClient = () => {
-  const { getToken } = useAuth();
-  const [supabase, setSupabase] = useState<any | null>(null);
+  const [tasks, setTasks] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [name, setName] = useState('')
+  // The `useUser()` hook is used to ensure that Clerk has loaded data about the signed in user
+  // const { user } = useUser()
+  // The `useSession()` hook is used to get the Clerk session object
+  // The session object is used to get the Clerk session token
+  const { session } = useSession()
 
-  useEffect(() => {
-    if (getToken) {
-      // This is the key part:
-      // 1. Get the special "supabase" token from Clerk
-      // 2. Create a new Supabase client
-      // 3. Tell the client to get the token from Clerk
-      const createClerkSupabaseClient = async () => {
-        const token = await getToken({ template: "supabase" });
-        
-        const client = createClient(supabaseUrl, supabaseKey, {
-          global: {
-            // Set the Authorization header on every request
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        });
-        setSupabase(client);
-      };
+  // Create a custom Supabase client that injects the Clerk session token into the request headers
+  function createClerkSupabaseClient() {
+    return createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_KEY!,
+      {
+        async accessToken() {
+          return session?.getToken() ?? null
+        },
+      },
+    )
+  }
 
-      createClerkSupabaseClient();
-    }
-  }, [getToken]);
-
-  return supabase;
-};
+  // Create a `client` object for accessing Supabase data using the Clerk token
+  return createClerkSupabaseClient()
+}

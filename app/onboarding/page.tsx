@@ -93,7 +93,7 @@ defaultValues: {
     const result = await response.json();
     console.log("Success result:", result);
     
-    router.push('/dashboard');
+    router.push('/dashboard2');
   } catch (err) {
     console.error("Catch block error:", err);
   }
