@@ -1,12 +1,17 @@
 'use client';
 
+import { useUser } from '@clerk/nextjs';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 
 // Main Dashboard Page Component
 export default function DashboardPage() {
   // Dark mode state - checks system preference on mount
+  const [topCareer, setTopCareer] = useState([]);
   const [isDarkMode, setIsDarkMode] = useState(false);
-
+  const router = useRouter();
+  const { isLoaded, user }= useUser();
   // Initialize dark mode from localStorage or system preference
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -19,6 +24,32 @@ export default function DashboardPage() {
       setIsDarkMode(false);
       document.documentElement.classList.remove('dark');
     }
+    fetch(`/api/v1/${user?.primaryEmailAddress?.emailAddress}/quizResults`)
+    .then(res => res.json())
+    .then(data => {
+      const {id, user_email, created_at, ...parameters} = data[0]
+      console.log("Input")
+      console.log(parameters)
+      fetch("http://localhost:8001/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type" : "application/json"
+        },
+        body: JSON.stringify({...parameters, conversation_id: "string"})
+      })
+      .then(res => res.json())
+      .then(str => {
+        console.log("Top 5 careers : ")
+        console.log(str)
+        const careers = str.response
+            .split('\n')                      // split by newline
+              .map(line => line.replace(/^\d+\.\s*/, '').trim());  // remove "1. ", "2. ", etc
+
+        setTopCareer(careers);
+      })
+      .catch(err => console.error(err))
+    })
+    .catch(err => console.error(err))
   }, []);
 
   // Toggle dark mode function
@@ -33,87 +64,12 @@ export default function DashboardPage() {
       setIsDarkMode(true);
     }
   };
-
+  if(!isLoaded) {
+    return <div>Loading...</div>
+  }
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-      {/* Navbar */}
-      <nav className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <div className="flex items-center gap-2">
-              <svg
-                className="w-8 h-8 text-violet-600 dark:text-violet-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
-              </svg>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">
-                CollegeDost
-              </span>
-            </div>
-
-            {/* Right side: Dark Mode Toggle + Welcome Message */}
-            <div className="flex items-center gap-4">
-              {/* Dark Mode Toggle Button */}
-              <button
-                onClick={toggleDarkMode}
-                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200"
-                aria-label="Toggle dark mode"
-              >
-                {isDarkMode ? (
-                  // Sun Icon (for light mode)
-                  <svg
-                    className="w-5 h-5 text-yellow-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                    />
-                  </svg>
-                ) : (
-                  // Moon Icon (for dark mode)
-                  <svg
-                    className="w-5 h-5 text-violet-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                    />
-                  </svg>
-                )}
-              </button>
-
-              {/* Welcome Message */}
-              <div className="flex items-center gap-3">
-                <span className="hidden sm:inline text-sm sm:text-base text-gray-700 dark:text-gray-300">
-                  Welcome, <span className="font-semibold text-violet-600 dark:text-violet-400">User!</span>
-                </span>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-semibold">
-                  U
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
+      
 
       {/* Main Content Container with Two-Column Layout (Desktop) */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -138,9 +94,9 @@ export default function DashboardPage() {
                   <p className="text-base md:text-lg text-gray-700 dark:text-gray-300">
                     Take our quiz and we can recommend the perfect path for you based on your interests and strengths.
                   </p>
-                  <button className="px-6 py-3 bg-violet-600 hover:bg-violet-700 dark:bg-violet-500 dark:hover:bg-violet-600 text-white font-semibold rounded-lg shadow-md transition-all duration-200 transform hover:scale-105">
+                  <Link href="/quiz" className="px-6 py-3 bg-violet-600 hover:bg-violet-700 dark:bg-violet-500 dark:hover:bg-violet-600 text-white font-semibold rounded-lg shadow-md transition-all duration-200 transform hover:scale-105">
                     Take Quiz Now
-                  </button>
+                  </Link>
                 </div>
 
                 {/* Illustration - Hidden on mobile */}
@@ -323,7 +279,7 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Action Button */}
-                  <button className="w-full py-2 px-4 bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 font-semibold rounded-lg hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors duration-200">
+                  <button onClick={()=> router.push('/dashboard2/commerce')} className="w-full py-2 px-4 bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 font-semibold rounded-lg hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors duration-200">
                     Explore Commerce
                   </button>
                 </div>
@@ -332,6 +288,7 @@ export default function DashboardPage() {
           </div>
 
           {/* RIGHT COLUMN: Top 5 Careers Sidebar - Only visible on DESKTOP (lg and above) */}
+          {topCareer.length > 0 &&
           <aside className="hidden lg:block lg:w-[30%]">
             <div className="bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 sticky top-8">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
@@ -347,11 +304,11 @@ export default function DashboardPage() {
 
               <div className="space-y-3">
                 {[
-                  { name: 'Software Engineer', icon: '💻', color: 'from-blue-500 to-cyan-500' },
-                  { name: 'Data Scientist', icon: '📊', color: 'from-purple-500 to-pink-500' },
-                  { name: 'Graphic Designer', icon: '🎨', color: 'from-pink-500 to-rose-500' },
-                  { name: 'Marketing Specialist', icon: '📈', color: 'from-orange-500 to-red-500' },
-                  { name: 'Content Creator', icon: '✍️', color: 'from-green-500 to-emerald-500' }
+                  { name: topCareer[0], icon: '🥇', color: 'from-blue-500 to-cyan-500' },
+                  { name: topCareer[1], icon: '🥈', color: 'from-purple-500 to-pink-500' },
+                  { name: topCareer[2], icon: '🥉', color: 'from-pink-500 to-rose-500' },
+                  { name: topCareer[3], icon: '🎖️', color: 'from-orange-500 to-red-500' },
+                  { name: topCareer[4], icon: '🎖️', color: 'from-green-500 to-emerald-500' }
                 ].map((career, index) => (
                   <div
                     key={index}
@@ -385,11 +342,12 @@ export default function DashboardPage() {
               </div>
 
               {/* View All Button */}
-              <button className="w-full mt-6 py-2 px-4 bg-violet-600 hover:bg-violet-700 dark:bg-violet-500 dark:hover:bg-violet-600 text-white font-semibold rounded-lg shadow-md transition-all duration-200">
+              {/* <button className="w-full mt-6 py-2 px-4 bg-violet-600 hover:bg-violet-700 dark:bg-violet-500 dark:hover:bg-violet-600 text-white font-semibold rounded-lg shadow-md transition-all duration-200">
                 View All Careers
-              </button>
+              </button> */}
             </div>
           </aside>
+}
         </div>
       </main>
     </div>

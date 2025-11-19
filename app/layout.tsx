@@ -9,6 +9,7 @@ import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { Navbar } from "@/components/navbar";
 import {ClerkProvider} from "@clerk/nextjs"
+import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
   title: {
