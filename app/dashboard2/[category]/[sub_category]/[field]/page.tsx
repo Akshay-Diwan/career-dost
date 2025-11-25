@@ -43,7 +43,7 @@ export default function CACoursePage() {
   "field": "Charted Accountant",
   "message": inputMessage,
   "role": "user",
-  "conversation_id": "string"
+  "conversation_id": "1"
     }    
       )
     })

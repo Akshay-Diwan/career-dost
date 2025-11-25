@@ -69,156 +69,156 @@ const quizQuestions =
         {"text": "Help with setup and tools", "weights": {"R": 9, "mechanical_aptitude": 8}}
       ]
     },
-    {
-      "id": 6,
-      "question": "What kind of activities do you enjoy online?",
-      "options": [
-        {"text": "Watching science/tech videos", "weights": {"I": 9, "tech_interest": 8}},
-        {"text": "Creating art, edits, or content", "weights": {"A": 10, "creativity": 10}},
-        {"text": "Learning new business ideas", "weights": {"E": 9, "finance_interest": 8}},
-        {"text": "Helping friends with questions", "weights": {"S": 10, "communication": 9}}
-      ]
-    },
-    {
-      "id": 7,
-      "question": "When you get a tough problem, what’s your reaction?",
-      "options": [
-        {"text": "Break it down logically", "weights": {"I": 10, "analytical_skill": 10}},
-        {"text": "Find a new creative approach", "weights": {"A": 9, "innovation": 9}},
-        {"text": "Ask others for input", "weights": {"S": 9, "teamwork": 8}},
-        {"text": "Stick with it until I solve it", "weights": {"R": 9, "patience": 8}}
-      ]
-    },
-    {
-      "id": 8,
-      "question": "What’s your favorite type of project?",
-      "options": [
-        {"text": "Building robots or circuits", "weights": {"R": 10, "engineering_interest": 9}},
-        {"text": "Writing or researching topics", "weights": {"I": 10, "learning_speed": 8}},
-        {"text": "Creating art, music, or media", "weights": {"A": 10, "creativity": 10}},
-        {"text": "Organizing data or systems", "weights": {"C": 10, "discipline": 8}}
-      ]
-    },
-    {
-      "id": 9,
-      "question": "How do you study before exams?",
-      "options": [
-        {"text": "Plan and follow a schedule", "weights": {"C": 10, "organization": 9}},
-        {"text": "Make visual diagrams or notes", "weights": {"A": 9, "visual_learning": 8}},
-        {"text": "Explain concepts to others", "weights": {"S": 10, "communication": 8}},
-        {"text": "Focus on understanding logic", "weights": {"I": 10, "analytical_skill": 9}}
-      ]
-    },
-    {
-      "id": 10,
-      "question": "What excites you most about science?",
-      "options": [
-        {"text": "Inventing or discovering new ideas", "weights": {"I": 10, "curiosity": 9}},
-        {"text": "Applying it to build something real", "weights": {"R": 10, "engineering_interest": 9}},
-        {"text": "Designing infographics or visuals", "weights": {"A": 9, "creativity": 9}},
-        {"text": "Teaching it to others", "weights": {"S": 10, "communication": 8}}
-      ]
-    },
-    {
-      "id": 11,
-      "question": "You are organizing a school fest. What’s your main focus?",
-      "options": [
-        {"text": "Budget and sponsors", "weights": {"E": 10, "finance_interest": 9}},
-        {"text": "Creative theme and presentation", "weights": {"A": 10, "creativity": 10}},
-        {"text": "Perfect event schedule", "weights": {"C": 10, "organization": 10}},
-        {"text": "Team collaboration and morale", "weights": {"S": 9, "leadership": 8}}
-      ]
-    },
-    {
-      "id": 12,
-      "question": "Which of these sounds like your dream job?",
-      "options": [
-        {"text": "Scientist or Engineer", "weights": {"I": 10, "R": 9}},
-        {"text": "Artist or Designer", "weights": {"A": 10}},
-        {"text": "Doctor, Teacher, or Counselor", "weights": {"S": 10}},
-        {"text": "Entrepreneur or Manager", "weights": {"E": 10}}
-      ]
-    },
-    {
-      "id": 13,
-      "question": "You’re given a choice to attend one workshop. Which one do you pick?",
-      "options": [
-        {"text": "3D printing and robotics", "weights": {"R": 10, "engineering_interest": 9}},
-        {"text": "Scientific research and experiments", "weights": {"I": 10, "scientific_reasoning": 9}},
-        {"text": "Art and design creativity", "weights": {"A": 10, "creativity": 9}},
-        {"text": "Public speaking and leadership", "weights": {"E": 10, "communication": 9}}
-      ]
-    },
-    {
-      "id": 14,
-      "question": "Your friends describe you as...",
-      "options": [
-        {"text": "Logical and analytical", "weights": {"I": 10}},
-        {"text": "Creative and artistic", "weights": {"A": 10}},
-        {"text": "Helpful and kind", "weights": {"S": 10}},
-        {"text": "Confident and outgoing", "weights": {"E": 10}}
-      ]
-    },
-    {
-      "id": 15,
-      "question": "Which of these skills do you enjoy improving?",
-      "options": [
-        {"text": "Coding or problem-solving", "weights": {"I": 10, "tech_interest": 9}},
-        {"text": "Drawing, editing, or creating", "weights": {"A": 10, "creativity": 9}},
-        {"text": "Speaking and influencing", "weights": {"E": 10, "leadership": 8}},
-        {"text": "Repairing and tinkering", "weights": {"R": 10, "mechanical_aptitude": 9}}
-      ]
-    },
-    {
-      "id": 16,
-      "question": "You prefer working...",
-      "options": [
-        {"text": "Independently with full focus", "weights": {"I": 9}},
-        {"text": "With a creative partner", "weights": {"A": 9}},
-        {"text": "As part of a friendly team", "weights": {"S": 9}},
-        {"text": "As the team leader", "weights": {"E": 9}}
-      ]
-    },
-    {
-      "id": 17,
-      "question": "If you could invent one thing, it would be...",
-      "options": [
-        {"text": "A robot to help people", "weights": {"R": 10, "engineering_interest": 8}},
-        {"text": "A cure or scientific breakthrough", "weights": {"I": 10, "scientific_reasoning": 9}},
-        {"text": "An artistic innovation", "weights": {"A": 10, "creativity": 10}},
-        {"text": "A tool to manage time or money better", "weights": {"E": 10, "finance_interest": 8}}
-      ]
-    },
-    {
-      "id": 18,
-      "question": "What motivates you to do your best?",
-      "options": [
-        {"text": "Curiosity and learning new things", "weights": {"I": 10, "learning_speed": 9}},
-        {"text": "Creating something unique", "weights": {"A": 10, "innovation": 9}},
-        {"text": "Helping and supporting others", "weights": {"S": 10, "emotional_intelligence": 8}},
-        {"text": "Winning and leading teams", "weights": {"E": 10, "leadership": 8}}
-      ]
-    },
-    {
-      "id": 19,
-      "question": "When given clear rules and steps, you...",
-      "options": [
-        {"text": "Follow them carefully", "weights": {"C": 10, "discipline": 9}},
-        {"text": "Try to improve the process", "weights": {"I": 9, "problem_solving": 8}},
-        {"text": "Add a creative twist", "weights": {"A": 9, "innovation": 9}},
-        {"text": "Prefer to make your own plan", "weights": {"E": 9, "leadership": 8}}
-      ]
-    },
-    {
-      "id": 20,
-      "question": "Which club would you most like to join?",
-      "options": [
-        {"text": "Science or Coding Club", "weights": {"I": 10, "tech_interest": 9}},
-        {"text": "Drama or Art Club", "weights": {"A": 10, "creativity": 9}},
-        {"text": "Social Service or Debate Club", "weights": {"S": 10, "communication": 9}},
-        {"text": "Business or Entrepreneurship Club", "weights": {"E": 10, "finance_interest": 9}}
-      ]
-    }
+    // {
+    //   "id": 6,
+    //   "question": "What kind of activities do you enjoy online?",
+    //   "options": [
+    //     {"text": "Watching science/tech videos", "weights": {"I": 9, "tech_interest": 8}},
+    //     {"text": "Creating art, edits, or content", "weights": {"A": 10, "creativity": 10}},
+    //     {"text": "Learning new business ideas", "weights": {"E": 9, "finance_interest": 8}},
+    //     {"text": "Helping friends with questions", "weights": {"S": 10, "communication": 9}}
+    //   ]
+    // },
+    // {
+    //   "id": 7,
+    //   "question": "When you get a tough problem, what’s your reaction?",
+    //   "options": [
+    //     {"text": "Break it down logically", "weights": {"I": 10, "analytical_skill": 10}},
+    //     {"text": "Find a new creative approach", "weights": {"A": 9, "innovation": 9}},
+    //     {"text": "Ask others for input", "weights": {"S": 9, "teamwork": 8}},
+    //     {"text": "Stick with it until I solve it", "weights": {"R": 9, "patience": 8}}
+    //   ]
+    // },
+    // {
+    //   "id": 8,
+    //   "question": "What’s your favorite type of project?",
+    //   "options": [
+    //     {"text": "Building robots or circuits", "weights": {"R": 10, "engineering_interest": 9}},
+    //     {"text": "Writing or researching topics", "weights": {"I": 10, "learning_speed": 8}},
+    //     {"text": "Creating art, music, or media", "weights": {"A": 10, "creativity": 10}},
+    //     {"text": "Organizing data or systems", "weights": {"C": 10, "discipline": 8}}
+    //   ]
+    // },
+    // {
+    //   "id": 9,
+    //   "question": "How do you study before exams?",
+    //   "options": [
+    //     {"text": "Plan and follow a schedule", "weights": {"C": 10, "organization": 9}},
+    //     {"text": "Make visual diagrams or notes", "weights": {"A": 9, "visual_learning": 8}},
+    //     {"text": "Explain concepts to others", "weights": {"S": 10, "communication": 8}},
+    //     {"text": "Focus on understanding logic", "weights": {"I": 10, "analytical_skill": 9}}
+    //   ]
+    // },
+    // {
+    //   "id": 10,
+    //   "question": "What excites you most about science?",
+    //   "options": [
+    //     {"text": "Inventing or discovering new ideas", "weights": {"I": 10, "curiosity": 9}},
+    //     {"text": "Applying it to build something real", "weights": {"R": 10, "engineering_interest": 9}},
+    //     {"text": "Designing infographics or visuals", "weights": {"A": 9, "creativity": 9}},
+    //     {"text": "Teaching it to others", "weights": {"S": 10, "communication": 8}}
+    //   ]
+    // },
+    // {
+    //   "id": 11,
+    //   "question": "You are organizing a school fest. What’s your main focus?",
+    //   "options": [
+    //     {"text": "Budget and sponsors", "weights": {"E": 10, "finance_interest": 9}},
+    //     {"text": "Creative theme and presentation", "weights": {"A": 10, "creativity": 10}},
+    //     {"text": "Perfect event schedule", "weights": {"C": 10, "organization": 10}},
+    //     {"text": "Team collaboration and morale", "weights": {"S": 9, "leadership": 8}}
+    //   ]
+    // },
+    // {
+    //   "id": 12,
+    //   "question": "Which of these sounds like your dream job?",
+    //   "options": [
+    //     {"text": "Scientist or Engineer", "weights": {"I": 10, "R": 9}},
+    //     {"text": "Artist or Designer", "weights": {"A": 10}},
+    //     {"text": "Doctor, Teacher, or Counselor", "weights": {"S": 10}},
+    //     {"text": "Entrepreneur or Manager", "weights": {"E": 10}}
+    //   ]
+    // },
+    // {
+    //   "id": 13,
+    //   "question": "You’re given a choice to attend one workshop. Which one do you pick?",
+    //   "options": [
+    //     {"text": "3D printing and robotics", "weights": {"R": 10, "engineering_interest": 9}},
+    //     {"text": "Scientific research and experiments", "weights": {"I": 10, "scientific_reasoning": 9}},
+    //     {"text": "Art and design creativity", "weights": {"A": 10, "creativity": 9}},
+    //     {"text": "Public speaking and leadership", "weights": {"E": 10, "communication": 9}}
+    //   ]
+    // },
+    // {
+    //   "id": 14,
+    //   "question": "Your friends describe you as...",
+    //   "options": [
+    //     {"text": "Logical and analytical", "weights": {"I": 10}},
+    //     {"text": "Creative and artistic", "weights": {"A": 10}},
+    //     {"text": "Helpful and kind", "weights": {"S": 10}},
+    //     {"text": "Confident and outgoing", "weights": {"E": 10}}
+    //   ]
+    // },
+    // {
+    //   "id": 15,
+    //   "question": "Which of these skills do you enjoy improving?",
+    //   "options": [
+    //     {"text": "Coding or problem-solving", "weights": {"I": 10, "tech_interest": 9}},
+    //     {"text": "Drawing, editing, or creating", "weights": {"A": 10, "creativity": 9}},
+    //     {"text": "Speaking and influencing", "weights": {"E": 10, "leadership": 8}},
+    //     {"text": "Repairing and tinkering", "weights": {"R": 10, "mechanical_aptitude": 9}}
+    //   ]
+    // },
+    // {
+    //   "id": 16,
+    //   "question": "You prefer working...",
+    //   "options": [
+    //     {"text": "Independently with full focus", "weights": {"I": 9}},
+    //     {"text": "With a creative partner", "weights": {"A": 9}},
+    //     {"text": "As part of a friendly team", "weights": {"S": 9}},
+    //     {"text": "As the team leader", "weights": {"E": 9}}
+    //   ]
+    // },
+    // {
+    //   "id": 17,
+    //   "question": "If you could invent one thing, it would be...",
+    //   "options": [
+    //     {"text": "A robot to help people", "weights": {"R": 10, "engineering_interest": 8}},
+    //     {"text": "A cure or scientific breakthrough", "weights": {"I": 10, "scientific_reasoning": 9}},
+    //     {"text": "An artistic innovation", "weights": {"A": 10, "creativity": 10}},
+    //     {"text": "A tool to manage time or money better", "weights": {"E": 10, "finance_interest": 8}}
+    //   ]
+    // },
+    // {
+    //   "id": 18,
+    //   "question": "What motivates you to do your best?",
+    //   "options": [
+    //     {"text": "Curiosity and learning new things", "weights": {"I": 10, "learning_speed": 9}},
+    //     {"text": "Creating something unique", "weights": {"A": 10, "innovation": 9}},
+    //     {"text": "Helping and supporting others", "weights": {"S": 10, "emotional_intelligence": 8}},
+    //     {"text": "Winning and leading teams", "weights": {"E": 10, "leadership": 8}}
+    //   ]
+    // },
+    // {
+    //   "id": 19,
+    //   "question": "When given clear rules and steps, you...",
+    //   "options": [
+    //     {"text": "Follow them carefully", "weights": {"C": 10, "discipline": 9}},
+    //     {"text": "Try to improve the process", "weights": {"I": 9, "problem_solving": 8}},
+    //     {"text": "Add a creative twist", "weights": {"A": 9, "innovation": 9}},
+    //     {"text": "Prefer to make your own plan", "weights": {"E": 9, "leadership": 8}}
+    //   ]
+    // },
+    // {
+    //   "id": 20,
+    //   "question": "Which club would you most like to join?",
+    //   "options": [
+    //     {"text": "Science or Coding Club", "weights": {"I": 10, "tech_interest": 9}},
+    //     {"text": "Drama or Art Club", "weights": {"A": 10, "creativity": 9}},
+    //     {"text": "Social Service or Debate Club", "weights": {"S": 10, "communication": 9}},
+    //     {"text": "Business or Entrepreneurship Club", "weights": {"E": 10, "finance_interest": 9}}
+    //   ]
+    // }
   ]
   // "traits": [
 //     "R", "I", "A", "S", "E", "C",
