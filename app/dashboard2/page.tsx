@@ -1,15 +1,18 @@
 'use client';
 
+import TopCareersSkeleton from '@/components/TopCareerSkeletion';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
+
 
 // Main Dashboard Page Component
 export default function DashboardPage() {
   // Dark mode state - checks system preference on mount
   const [topCareer, setTopCareer] = useState([]);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isCareerLoading, setIsCareerLoading] = useState(false);
   const router = useRouter();
   const { isLoaded, user }= useUser();
   // Initialize dark mode from localStorage or system preference
@@ -24,6 +27,7 @@ export default function DashboardPage() {
       setIsDarkMode(false);
       document.documentElement.classList.remove('dark');
     }
+    setIsCareerLoading(true);
     fetch(`/api/v1/${user?.primaryEmailAddress?.emailAddress}/quizResults`)
     .then(res => res.json())
     .then(data => {
@@ -47,6 +51,7 @@ export default function DashboardPage() {
 
         setTopCareer(careers);
       })
+      .finally(()=> setIsCareerLoading(false))
       .catch(err => console.error(err))
     })
     .catch(err => console.error(err))
@@ -132,6 +137,8 @@ export default function DashboardPage() {
             </div>
 
             {/* Top 5 Careers Section - Only visible on MOBILE (shown after Quiz CTA, before Subject Cards) */}
+            {
+              topCareer.length > 0 &&
             <div className="lg:hidden bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <svg className="w-6 h-6 text-violet-600 dark:text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -142,11 +149,11 @@ export default function DashboardPage() {
               
               <div className="space-y-3">
                 {[
-                  { name: 'Software Engineer', icon: '💻' },
-                  { name: 'Data Scientist', icon: '📊' },
-                  { name: 'Graphic Designer', icon: '🎨' },
-                  { name: 'Marketing Specialist', icon: '📈' },
-                  { name: 'Content Creator', icon: '✍️' }
+                  { name: topCareer[0], icon: '🥇', color: 'from-blue-500 to-cyan-500' },
+                  { name: topCareer[1], icon: '🥈', color: 'from-purple-500 to-pink-500' },
+                  { name: topCareer[2], icon: '🥉', color: 'from-pink-500 to-rose-500' },
+                  { name: topCareer[3], icon: '🎖️', color: 'from-orange-500 to-red-500' },
+                  { name: topCareer[4], icon: '🎖️', color: 'from-green-500 to-emerald-500' }
                 ].map((career, index) => (
                   <div
                     key={index}
@@ -165,6 +172,7 @@ export default function DashboardPage() {
                 ))}
               </div>
             </div>
+}
 
             {/* Subject Cards Section */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -288,6 +296,9 @@ export default function DashboardPage() {
           </div>
 
           {/* RIGHT COLUMN: Top 5 Careers Sidebar - Only visible on DESKTOP (lg and above) */}
+          {
+            isCareerLoading && <TopCareersSkeleton/>
+          }
           {topCareer.length > 0 &&
           <aside className="hidden lg:block lg:w-[30%]">
             <div className="bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 sticky top-8">
@@ -340,11 +351,6 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
-
-              {/* View All Button */}
-              {/* <button className="w-full mt-6 py-2 px-4 bg-violet-600 hover:bg-violet-700 dark:bg-violet-500 dark:hover:bg-violet-600 text-white font-semibold rounded-lg shadow-md transition-all duration-200">
-                View All Careers
-              </button> */}
             </div>
           </aside>
 }
