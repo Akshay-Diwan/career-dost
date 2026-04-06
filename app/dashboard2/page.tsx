@@ -30,12 +30,12 @@ export default function DashboardPage() {
       const {id, user_email, created_at, ...parameters} = data[0]
       console.log("Input")
       console.log(parameters)
-      fetch("http://localhost:8001/chat", {
+      fetch("http://localhost:8000/quizResult", {
         method: "POST",
         headers: {
           "Content-Type" : "application/json"
         },
-        body: JSON.stringify({...parameters, conversation_id: "string"})
+        body: JSON.stringify({...parameters, conversation_id: "1"})
       })
       .then(res => res.json())
       .then(str => {
